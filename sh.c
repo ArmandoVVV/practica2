@@ -19,7 +19,7 @@ int main(){
 		if(strcmp(comando, "exit") == 0){
 			salida = 1;
 		}else if(strcmp(comando, "shutdown") == 0){
-			salida = 2;
+			execlp("killall","init.out","getty.out","sh.out",NULL);
 		}else{
             		pid = fork();
             		if(pid == 0){
@@ -30,6 +30,4 @@ int main(){
         	}
 		memset(comando, 0, sizeof(comando));
     }while(!salida);
-    
-    exit(salida);
 }
