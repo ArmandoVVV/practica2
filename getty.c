@@ -5,30 +5,52 @@
 #include <string.h>
 #include <signal.h>
 
-int validarUsuario(){
+int validarUsuario(char *user_pswd){
+    FILE *pswfile;
+    char file_line[40];
+    
+    pswfile = fopen("passwd.txt","r");  //abrir el documento
+    
+    while(fgets(file_line,sizeof(file_line),pswfile) != NULL){
+        if(strcmp(user_pswd,file_line) == 0){
+            return 1;  
+        }
+    }
 
-
-    return 1;
+    return 0;
 }
 
 int main(){
-
-    char password[20];
+    
     char user[20];
-
-    printf("user: \n");
-    fgets(user,  80, stdin);
-    printf("password: \n");
-    fgets(password,  80, stdin);
-    if(validarUsuario()){
-        printf("authorized access  \n");
-        //crear proceso hijo que sera reemplazado por una sesion shell
-        int p = fork();
-        if(p == 0){
-            execlp("./sh.out", "./sh.out", NULL);
+    char password[20];
+    int p;
+    
+    //while(1){
+        printf("user: \n");
+        fgets(user,  80, stdin);
+        printf("password: \n");
+        fgets(password,  80, stdin);
+        
+        size_t len = strlen(user);
+        if (len >= 1) {
+            user[len-1] = 0;
         }
-        else{
-            wait(NULL);
+    
+        strcat(user, ":");      //unir el user y el password en una sola variable
+        strcat(user, password);
+        printf("%s\n", user);
+        if(validarUsuario(user)){
+            printf("authorized access  \n");
+            //crear proceso hijo que sera reemplazado por una sesion shell
+            p = fork();
+            if(p == 0){
+                execlp("./sh.out", "./sh.out", NULL);
+            }else{
+                wait(NULL);
             }
-    }
+        }else{
+            printf("Validacion incorrecta\n");
+        }
+    //}
 }
